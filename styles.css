@@ -1,0 +1,36 @@
+
+* {
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-weight: normal;
+  }
+
+body {
+    padding: 0;
+    margin: 0;
+    background: rgb(125, 125, 173);
+}
+
+ input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;}
+
+button {
+    color: white;
+    background-color: rgba(76, 71, 109, 0.265);
+    width: auto;
+    height: 60px;
+    font-size: 40px;
+    border-radius: 10px;
+    border-color:  white;
+    border-style: solid;
+    min-width: 60px;
+}
+
+button:hover {
+    opacity: 0.7;
+}
