@@ -68,29 +68,28 @@ function searchBooks() {
                             return response.json();
                         })
                         .then(() => {
-                            fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
+                            return fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
                                 .then(response => {
                                     if (!response.ok) {
                                         throw new Error(`Error: ${response.statusText}`);
                                     }
                                     return response.json();
-                                })
-                                .then(subjectData => {
-                                    const description = subjectData.description;
-                                    if (!description) {
-                                        console.error('Description not found');
-                                        return;
-                                    }
-                                    let descriptionElement = document.createElement('p');
-                                    descriptionElement.innerHTML = description;
-                                    let descriptionContainer = document.getElementById('description-container');
-                                    if (!descriptionContainer) {
-                                        console.error('Description container not found');
-                                        return;
-                                    }
-                                    descriptionContainer.appendChild(descriptionElement);
-                                })
-                                .catch(error => console.log(error));
+                                });
+                        })
+                        .then(subjectData => {
+                            const description = subjectData.description;
+                            if (!description) {
+                                console.error('Description not found');
+                                return;
+                            }
+                            let descriptionElement = document.createElement('p');
+                            descriptionElement.innerHTML = description;
+                            let descriptionContainer = document.getElementById('description-container');
+                            if (!descriptionContainer) {
+                                console.error('Description container not found');
+                                return;
+                            }
+                            descriptionContainer.appendChild(descriptionElement);
                         })
                         .catch(error => console.log(error));
                 });
