@@ -60,22 +60,27 @@ function searchBooks() {
                         return;
                     }
 
-                    fetch(`https://openlibrary.org/books/${bookKey}.json`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`Error: ${response.statusText}`);
-                            }
-                            return response.json();
-                        })
-                        .then(() => {
-                            return fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error(`Error: ${response.statusText}`);
-                                    }
-                                    return response.json();
-                                });
-                        })
+    const fetchBookData = async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch book data: ${response.statusText}`);
+        }
+        return response.json();
+    };
+    };
+    
+    try {
+        await fetchBook(`https://openlibrary.org/books/${bookKey}.json`);
+        const subjectData = await fetchBook(`https://openlibrary.org/subjects/${categoryValue}.json`);
+    } catch (error) {
+        console.error(error);
+    }
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`Error: ${response.statusText}`);
+                                }
+                                return response.json();
+                            })
                         .then(subjectData => {
                             const description = subjectData.description;
                             if (!description) {
