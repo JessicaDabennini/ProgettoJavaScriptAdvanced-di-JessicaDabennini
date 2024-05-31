@@ -75,7 +75,8 @@ async function fetchBookData(bookKey) {
     }
 }
 
-function displayResults(data) {
+
+async function displayResults(data) {
     const resultsElement = document.getElementById('results');
     if (!resultsElement) {
         throw new Error('Results element not found');
@@ -85,8 +86,6 @@ function displayResults(data) {
     if (!data ||!data.works) {
         throw new Error('Invalid data');
     }
-
-    
 
     data.works.forEach(result => {
         const authors = result.authors? result.authors.map(author => author.name).join(', ') : '';
@@ -98,24 +97,30 @@ function displayResults(data) {
         resultElement.addEventListener('click', async function() {
             try {
                 const bookKey = result.key;
-                if (!bookKey) {
-                    throw new Error('Book key not found');
+                const response = await fetch(`https://openlibrary.org${book.key}.json`);
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
                 }
-
-                const bookData = await fetchBookData(bookKey);
-                const categoryValue = await getSearchBarValue();
-                const subjectData = await fetchSubjectData(categoryValue);
-                await displayDescription(bookData, subjectData);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const contentBody = doc.querySelector(content);
+                if (!contentBody) {
+                    throw new Error('Content body not found');
+                }
+                const descriptionContainer = document.getElementById('description-container');
+                descriptionContainer.innerHTML = '';
+                descriptionContainer.appendChild(document.createElement('p')).textContent = contentBody.innerHTML;
             } catch (error) {
-                displayErrorMessage(error);
+                console.log(error);
             }
         });
     });
 }
 
 
+async function displayDescription() {
 
-async function displayDescription(bookData, subjectData) {
     const descriptionContainer = document.getElementById('description-container');
     if (!descriptionContainer) {
         throw new Error('Description container not found');
@@ -139,4 +144,4 @@ async function displayDescription(bookData, subjectData) {
 // document.querySelector("#contentBody > div.workDetails > div.editionAbout > div.book-description.read-more.read-more--expanded > div")
 // #contentBody 
 // //*[@id="contentBody"]
-//read-more__content                        
+//read-more__content     #contentBody                   
