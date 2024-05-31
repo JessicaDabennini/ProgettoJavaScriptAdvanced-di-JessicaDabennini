@@ -17,96 +17,126 @@ let descriptionContainer = document.createElement('div');
 descriptionContainer.id = 'description-container';
 document.body.appendChild(descriptionContainer);
 
+let errorMessageElement = document.createElement('p');
+errorMessageElement.id = 'error-message';
+document.body.appendChild(errorMessageElement);
+
 document.getElementById('searchButton').addEventListener('click', searchBooks);
-
-function searchBooks() {
-    let category = document.getElementById('searchBar');
-    if (!category) {
-        console.error('Search bar not found');
-        return;
+async function searchBooks() {
+    try {
+        const categoryValue = await getSearchBarValue();
+        const data = await fetchSubjectData(categoryValue);
+         displayResults(data);
+    } catch (error) {
+        displayErrorMessage(error);
     }
+}
+function getSearchBarValue() {
+    return new Promise((resolve, reject) => {
+        const category = document.getElementById('searchBar');
+        if (!category) {
+            reject(new Error('Search bar not found'));
+            return;
+        }
 
-    let categoryValue = category.value;
-    if (!categoryValue) {
-        console.error('Category value is empty');
-        return;
-    }
+        const categoryValue = category.value.trim();
+        if (!categoryValue) {
+            reject(new Error('Category value is empty'));
+            return;
+        }
 
-    fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            let resultsElement = document.getElementById('results');
-            if (!resultsElement) {
-                console.error('Results element not found');
-                return;
-            }
-            resultsElement.innerHTML = '';
-            data.works.forEach(result => {
-                let authors = result.authors.map(author => author.name).join(', ');
-                let resultElement = document.createElement('li');
-                resultElement.textContent = `${result.title} by ${authors}`;
-                resultElement.id = 'resultElement';
-                resultsElement.appendChild(resultElement);
+        resolve(categoryValue);
+    });
+}
 
-                resultElement.addEventListener('click', function() {
-                    const bookKey = result.key;
-                    if (!bookKey) {
-                        console.error('Book key not found');
-                        return;
-                    }
+function fetchSubjectData(categoryValue) {
+    return new Promise((resolve, reject) => {
+        fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => resolve(data))
+            .catch(error => reject(new Error(`Error fetching subject data: ${error.message}`)));
+    });
+}
 
-    const fetchBookData = async (url) => {
-        const response = await fetch(url);
+async function fetchBookData(bookKey) {
+    try {
+        const response = await fetch(`https://openlibrary.org/books/${bookKey}.json`);
         if (!response.ok) {
-            throw new Error(`Failed to fetch book data: ${response.statusText}`);
+            throw new Error(`Error: ${response.statusText}`);
         }
         return response.json();
-    };
-    };
-    
-    try {
-        await fetchBook(`https://openlibrary.org/books/${bookKey}.json`);
-        const subjectData = await fetchBook(`https://openlibrary.org/subjects/${categoryValue}.json`);
     } catch (error) {
-        console.error(error);
+        throw new Error(`Error fetching book data: ${error.message}`);
     }
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`Error: ${response.statusText}`);
-                                }
-                                return response.json();
-                            })
-                        .then(subjectData => {
-                            const description = subjectData.description;
-                            if (!description) {
-                                console.error('Description not found');
-                                return;
-                            }
-                            let descriptionElement = document.createElement('p');
-                            descriptionElement.innerHTML = description;
-                            let descriptionContainer = document.getElementById('description-container');
-                            if (!descriptionContainer) {
-                                console.error('Description container not found');
-                                return;
-                            }
-                            descriptionContainer.appendChild(descriptionElement);
-                        })
-                        .catch(error => console.log(error));
-                });
-            });
-        })
-        .catch(error => console.log(error));
+}
+
+function displayResults(data) {
+    const resultsElement = document.getElementById('results');
+    if (!resultsElement) {
+        throw new Error('Results element not found');
+    }
+    resultsElement.innerHTML = '';
+
+    if (!data ||!data.works) {
+        throw new Error('Invalid data');
+    }
+
+    
+
+    data.works.forEach(result => {
+        const authors = result.authors? result.authors.map(author => author.name).join(', ') : '';
+        const resultElement = document.createElement('li');
+        resultElement.textContent = `${result.title || ''} by ${authors}`;
+        resultElement.id = 'resultElement';
+        resultsElement.appendChild(resultElement);
+
+        resultElement.addEventListener('click', async function() {
+            try {
+                const bookKey = result.key;
+                if (!bookKey) {
+                    throw new Error('Book key not found');
+                }
+
+                const bookData = await fetchBookData(bookKey);
+                const categoryValue = await getSearchBarValue();
+                const subjectData = await fetchSubjectData(categoryValue);
+                await displayDescription(bookData, subjectData);
+            } catch (error) {
+                displayErrorMessage(error);
+            }
+        });
+    });
 }
 
 
-// document.querySelector("#contentBody > div.workDetails > div.editionAbout > div.book-description.read-more.read-more--expanded > div")
-// #contentBody > div.workDetails > div.editionAbout > div.book-description.read-more.read-more--expanded > div
-// //*[@id="contentBody"]/div[1]/div[3]/div[4]/div
-// <div class="read-more__content" 
 
-//                         read-more__content
+async function displayDescription(bookData, subjectData) {
+    const descriptionContainer = document.getElementById('description-container');
+    if (!descriptionContainer) {
+        throw new Error('Description container not found');
+    }
+
+    descriptionContainer.innerHTML = '';
+
+    if (!subjectData || !subjectData.description) {
+        throw new Error('Description not found');
+    }
+
+    const description = subjectData.description;
+    const descriptionElement = document.createElement('p');
+    descriptionElement.textContent = description;
+    descriptionContainer.appendChild(descriptionElement);
+}
+
+
+   
+
+// document.querySelector("#contentBody > div.workDetails > div.editionAbout > div.book-description.read-more.read-more--expanded > div")
+// #contentBody 
+// //*[@id="contentBody"]
+//read-more__content                        
