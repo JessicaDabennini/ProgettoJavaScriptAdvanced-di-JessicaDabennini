@@ -1,3 +1,4 @@
+
 let searchBar = document.createElement('input');
 searchBar.type = 'text';
 searchBar.id = 'searchBar';
