@@ -1,7 +1,7 @@
 let searchBar = document.createElement('input');
 searchBar.type = 'text';
 searchBar.id = 'searchBar';
-searchBar.placeholder = 'Search...';
+searchBar.placeholder = 'Search the category...';
 document.body.appendChild(searchBar);
 
 let searchButton = document.createElement('button');
@@ -13,15 +13,17 @@ let resultsElement = document.createElement('ul');
 resultsElement.id = 'results';
 document.body.appendChild(resultsElement);
 
-// let descriptionContainer = document.createElement('div');
-// descriptionContainer.id = 'description-container';
-// document.body.appendChild(descriptionContainer);
 
 let errorMessageElement = document.createElement('p');
 errorMessageElement.id = 'error-message';
 document.body.appendChild(errorMessageElement);
 
 document.getElementById('searchButton').addEventListener('click', searchBooks);
+document.getElementById('searchBar').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      searchBooks();
+    }
+  });
 async function searchBooks() {
     try {
         const categoryValue = await getSearchBarValue();
@@ -64,17 +66,19 @@ async function fetchSubjectData(categoryValue) {
     }
 }
 
-// async function displayResults(data) {
-//     const resultsElement = document.getElementById('results');
-//     if (!resultsElement) {
-//         throw new Error('Results element not found');
-//     }
-//     resultsElement.innerHTML = '';
-//     if (!data || !data.works) {
-//         throw new Error('Invalid data');
-//     }
-// }
+async function fetchImage(url) {
+    if (!url) {
+        throw new Error('URL is missing');
+    }
+    
+    const img = await fetch(`https://covers.openlibrary.org/b/olid/${key}-S.jpg`);
 
+    return new Promise((resolve, reject) => {
+        img.onload = () => resolve(img);
+        img.onerror = (e) => reject(e);
+        img.src = url;
+    });
+}
 async function displayResults(data) {
     const resultsElement = document.getElementById('results');
     if (!resultsElement) {
@@ -85,6 +89,7 @@ async function displayResults(data) {
         throw new Error('Invalid data');
     }
     data.works.forEach(async (result) => {
+
         const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
         const resultElement = document.createElement('li');
         resultElement.textContent = `${result.title || ''} by ${authors}`;
@@ -92,24 +97,17 @@ async function displayResults(data) {
         resultElement.dataset.bookKey = result.key; 
         resultsElement.appendChild(resultElement);
 
-        
         const descriptionContainer = document.createElement('div');
         descriptionContainer.id = 'descriptionContainer';
         resultElement.appendChild(descriptionContainer);
 
         const descriptionElement = document.createElement('p');
         descriptionElement.id = 'descriptionElement';
+        descriptionElement.textContent = 'Ops... no description available';
         descriptionElement.dataset.bookKey = result.key;
         descriptionContainer.appendChild(descriptionElement);
         descriptionContainer.style.display = 'none';
 
-        // resultElement.addEventListener('click', function(event) {
-        //     const target = event.target;
-        //     const descriptionContainer = target.querySelector('#descriptionContainer');
-        //     if (descriptionContainer) {
-        //         descriptionContainer.style.display = descriptionContainer.style.display === 'none' ? 'block' : 'none';
-        //     }
-        // });        
         resultElement.addEventListener('click', function(event) {
             const target = event.target;
             const clickedDescriptionContainer = target.querySelector('#descriptionContainer');
@@ -126,11 +124,6 @@ async function displayResults(data) {
             }
         });
 
-        // resultsElement.addEventListener('click', function() {
-        //     const descriptionContainer = document.getElementById('descriptionContainer');
-        //     descriptionContainer.style.display = descriptionContainer.style.display === 'block' ? 'none' : 'block';
-        // });    
-        // Fetch book data and update the description element
         fetchBookData(result.key).then(bookData => {
             if (!bookData) {
                 console.error("fetchBookData failed");
@@ -144,13 +137,8 @@ async function displayResults(data) {
         }).catch(error => {
             console.error("fetchBookData failed: ", error);
         });
-        
-
-
-    });
-
+        });
 }
-
 
 async function fetchBookData(bookKey) {
   try {
@@ -171,60 +159,5 @@ async function fetchBookData(bookKey) {
   }
 }
 
-// async function searchBooks() {
-//     try {
-//         const categoryValue = await getSearchBarValue();
-//         const data = await fetchSubjectData(categoryValue);
-//         displayResults(data);
-//         data.works.forEach(async (result) => {
-//             const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
-//             const resultElement = document.createElement('li');
-//             resultElement.textContent = `${result.title || ''} by ${authors}`;
-//             resultElement.id = 'resultElement';
-//             resultElement.dataset.bookKey = result.key; 
-//             resultsElement.appendChild(resultElement);
-    
-//         });
-//     } catch (error) {
-//         displayErrorMessage(error);
-//         console.error("Error: ", error);
-//     }
-// }
 
-//  resultsElement.addEventListener('click', ResultClick);
- // Add this code where you handle the click event for resultsElement
-
-// function ResultClick(event) {
-//     if (!event || !event.target) {
-//         console.error("ResultClick called with invalid event or target");
-//         return;
-//     }
-//     const target = event.target;
-//     if (target.id !== 'resultElement') {
-//         console.log("target.id is not 'resultElement'");
-//         return;
-//     }
-//     const bookKey = target.dataset.bookKey;
-//     if (!bookKey) {
-//         console.error("bookKey is not defined");
-//         return;
-//     }
-//     fetchBookData(bookKey).then(bookData => {
-//         if (!bookData) {
-//             console.error("fetchBookData failed");
-//             return;
-//         }
-//         console.log("fetchBookData success", bookData);
-//         const descriptionElement = document.createElement('li');
-//         descriptionElement.id = 'descriptionElement';
-//         const descriptionText = document.createElement('p');
-//         descriptionText.textContent = bookData.description.value || bookData.description;
-//         descriptionElement.appendChild(descriptionText);
-//         descriptionElement.dataset.bookKey = bookKey;
-//         descriptionContainer.innerHTML = ''; 
-//         descriptionContainer.appendChild(descriptionElement);
-//     }).catch(error => {
-//         console.error("fetchBookData failed: ", error);
-//     });
-// }
 
