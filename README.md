@@ -1,6 +1,6 @@
 # Book Search App
 
-[!Image Alt Text(/images/img_README.png)]
+![Image Alt Text](/images/img_README.png)
 A simple book search app that allows users to search for books by category and display the results.
 
 ## Features
