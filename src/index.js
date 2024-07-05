@@ -18,13 +18,12 @@ let errorMessageElement = document.createElement('p');
 errorMessageElement.id = 'error-message';
 document.body.appendChild(errorMessageElement);
 
-document.getElementById('searchButton').addEventListener('click', searchBooks);
-document.getElementById('searchBar').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      searchBooks();
-    }
-  });
-async function searchBooks() {
+searchButton.addEventListener('click', searchBooks);
+searchBar.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    searchBooks();
+  }
+});async function searchBooks() {
     try {
         const categoryValue = await getSearchBarValue();
         const data = await fetchSubjectData(categoryValue);
@@ -55,7 +54,6 @@ async function fetchSubjectData(categoryValue) {
             throw new Error('Category value is empty');
         }
         const response = await fetch(`https://openlibrary.org/subjects/${categoryValue}.json`);
-        console.log(response);
         if (!response.ok) {
             throw new Error('Bad Request');
         }
@@ -63,28 +61,15 @@ async function fetchSubjectData(categoryValue) {
         return body;
     }   catch (error) {
         console.error(error);
+        throw error;
     }
-}
-
-async function fetchImage(url) {
-    if (!url) {
-        throw new Error('URL is missing');
-    }
-    
-    const img = await fetch(`https://covers.openlibrary.org/b/olid/${key}-S.jpg`);
-
-    return new Promise((resolve, reject) => {
-        img.onload = () => resolve(img);
-        img.onerror = (e) => reject(e);
-        img.src = url;
-    });
 }
 async function displayResults(data) {
     const resultsElement = document.getElementById('results');
     if (!resultsElement) {
         throw new Error('Results element not found');
     }
-    resultsElement.innerHTML = '';
+    resultsElement.textContent = '';
     if (!data || !data.works) {
         throw new Error('Invalid data');
     }
