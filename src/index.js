@@ -24,9 +24,15 @@ searchBar.addEventListener('keyup', (e) => {
   }
 });
 
-searchBar.addEventListener('input', () => {
+searchButton.addEventListener('click', () => {
   searchBooks();
 });
+
+searchBar.addEventListener('touchstart', (e) => {
+    searchBooks();
+  }
+);
+
 async function searchBooks() {
     const categoryValue = await getSearchBarValue().catch(displayErrorMessage);
     if (!categoryValue) return;
