@@ -24,10 +24,9 @@ searchBar.addEventListener('keyup', (e) => {
   }
 });
 
-searchButton.addEventListener('click', () => {
+searchBar.addEventListener('input', () => {
   searchBooks();
 });
-
 async function searchBooks() {
     const categoryValue = await getSearchBarValue().catch(displayErrorMessage);
     if (!categoryValue) return;
