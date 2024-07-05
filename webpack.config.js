@@ -18,10 +18,10 @@ const path = require('path');
          ],
        },
        {
-         test: /\.(png|svg|jpg|jpeg|gif)$/i,
-         type: 'asset',
+         test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
+         type: 'images',
          generator: {
-           filename: 'assets/images/[name][ext][query]',
+           filename: 'images/[name][ext][query]',
          },
        },
        {
