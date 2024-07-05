@@ -18,13 +18,11 @@ let errorMessageElement = document.createElement('p');
 errorMessageElement.id = 'error-message';
 document.body.appendChild(errorMessageElement);
 
-searchButton.addEventListener('click', searchBooks);
-searchBar.addEventListener('keydown', (e) => {
+searchBar.addEventListener('keyup', (e) => {
   if (e.key === 'Enter') {
     searchBooks();
-}
+  }
 });
-
 async function searchBooks() {
     const categoryValue = await getSearchBarValue().catch(displayErrorMessage);
     if (!categoryValue) return;
