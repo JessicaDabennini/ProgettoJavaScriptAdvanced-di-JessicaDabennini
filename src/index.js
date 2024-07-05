@@ -23,6 +23,11 @@ searchBar.addEventListener('keyup', (e) => {
     searchBooks();
   }
 });
+
+searchButton.addEventListener('click', () => {
+  searchBooks();
+});
+
 async function searchBooks() {
     const categoryValue = await getSearchBarValue().catch(displayErrorMessage);
     if (!categoryValue) return;
