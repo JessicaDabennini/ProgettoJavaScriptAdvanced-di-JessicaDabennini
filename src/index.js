@@ -26,46 +26,20 @@ searchBar.addEventListener('keydown', (e) => {
 });
 
 async function searchBooks() {
-    try {
-        const categoryValue = await getSearchBarValue();
-        const data = await fetchSubjectData(categoryValue);
-        displayResults(data);
-    } catch (error) {
-        displayErrorMessage(error);
-    }
+    const categoryValue = await getSearchBarValue().catch(displayErrorMessage);
+    if (!categoryValue) return;
+    const data = await fetchSubjectData(categoryValue).catch(displayErrorMessage);
+    if (!data) return;
+    displayResults(data);
 }
 
-function getSearchBarValue() {
-    return new Promise((resolve, reject) => {
-        const category = document.getElementById('searchBar');
-        if (!category) {
-            reject(new Error('Search bar not found'));
-            return;
-        }
-        const categoryValue = category.value.trim();
-        if (!categoryValue) {
-            reject(new Error('Category value is empty'));
-            return;
-        }
-        resolve(categoryValue);
-    });
-}
+const getSearchBarValue = () => document.getElementById('searchBar')?.value.trim() || Promise.reject(new Error('Search bar not found'));
 
 async function fetchSubjectData(categoryValue) {
-    try {
-        if (!categoryValue) {
-            throw new Error('Category value is empty');
-        }
-        const response = await fetch(`https://openlibrary.org/subjects/${categoryValue}.json`);
-        if (!response.ok) {
-            throw new Error('Bad Request');
-        }
-        const body = await response.json();
-        return body;
-    }   catch (error) {
-        console.error(error);
-        throw error;
-    }
+  const url = `https://openlibrary.org/subjects/${categoryValue}.json`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Bad Request');
+  return await response.json();
 }
 
 const loadingBar = document.getElementById('loading-bar');
@@ -86,64 +60,60 @@ async function searchBooks() {
 }
 
 async function displayResults(data) {
-    const resultsElement = document.getElementById('results');
-    if (!resultsElement) {
-        throw new Error('Results element not found');
-    }
-    resultsElement.textContent = '';
-    if (!data || !data.works) {
-        throw new Error('Invalid data');
-    }
-    data.works.forEach(async (result) => {
+  const resultsElement = document.getElementById('results');
+  if (!resultsElement) throw new Error('Results element not found');
+  resultsElement.textContent = '';
+  if (!data || !data.works) throw new Error('Invalid data');
 
-        const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
-        const resultElement = document.createElement('li');
-        resultElement.textContent = `${result.title || ''} by ${authors}`;
-        resultElement.id = 'resultElement';
-        resultElement.dataset.bookKey = result.key; 
-        resultsElement.appendChild(resultElement);
+  const promises = data.works.map(result => {
+    const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
+    const resultElement = document.createElement('li');
+    resultElement.textContent = `${result.title || ''} by ${authors}`;
+    resultElement.id = 'resultElement';
+    resultElement.dataset.bookKey = result.key;
+    resultsElement.appendChild(resultElement);
 
-        const descriptionContainer = document.createElement('div');
-        descriptionContainer.id = 'descriptionContainer';
-        resultElement.appendChild(descriptionContainer);
+    const descriptionContainer = document.createElement('div');
+    descriptionContainer.id = 'descriptionContainer';
+    resultElement.appendChild(descriptionContainer);
 
-        const descriptionElement = document.createElement('p');
-        descriptionElement.id = 'descriptionElement';
-        descriptionElement.textContent = 'Ops... no description available';
-        descriptionElement.dataset.bookKey = result.key;
-        descriptionContainer.appendChild(descriptionElement);
-        descriptionContainer.style.display = 'none';
+    const descriptionElement = document.createElement('p');
+    descriptionElement.id = 'descriptionElement';
+    descriptionElement.textContent = 'Ops... no description available';
+    descriptionElement.dataset.bookKey = result.key;
+    descriptionContainer.appendChild(descriptionElement);
+    descriptionContainer.style.display = 'none';
 
-        resultElement.addEventListener('click', function(event) {
-            const target = event.target;
-            const clickedDescriptionContainer = target.querySelector('#descriptionContainer');
-        
-            if (clickedDescriptionContainer) {
-                const allDescriptionContainers = document.querySelectorAll('#descriptionContainer');
-                allDescriptionContainers.forEach(container => {
-                    if (container !== clickedDescriptionContainer) {
-                        container.style.display = 'none';
-                    }
-                });
-        
-                clickedDescriptionContainer.style.display = clickedDescriptionContainer.style.display === 'none' ? 'block' : 'none';
-            }
-        });
+    resultElement.addEventListener('click', toggleDescription);
 
-        fetchBookData(result.key).then(bookData => {
-            if (!bookData) {
-                console.error("fetchBookData failed");
-                return;
-            }
-            console.log("fetchBookData success", bookData);
-            const descriptionText = document.createElement('p');
-            descriptionText.textContent = bookData.description.value || bookData.description;
-            descriptionElement.innerHTML = '';
-            descriptionElement.appendChild(descriptionText);
-        }).catch(error => {
-            console.error("fetchBookData failed: ", error);
-        });
-        });
+    return fetchBookData(result.key).then(bookData => {
+      if (bookData) {
+        const descriptionText = document.createElement('p');
+        descriptionText.textContent = bookData.description.value || bookData.description;
+        descriptionElement.textContent = '';
+        descriptionElement.appendChild(descriptionText);
+      }
+    });
+  });
+
+  await Promise.all(promises);
+}
+
+function toggleDescription(event) {
+  const target = event.target;
+  const clickedDescriptionContainer = target.querySelector('#descriptionContainer');
+
+  if (clickedDescriptionContainer) {
+    const allDescriptionContainers = document.querySelectorAll('#descriptionContainer');
+    allDescriptionContainers.forEach(container => {
+      if (container !== clickedDescriptionContainer) {
+        container.style.display = 'none';
+      }
+    });
+
+    clickedDescriptionContainer.style.display =
+      clickedDescriptionContainer.style.display === 'none' ? 'block' : 'none';
+  }
 }
 
 async function fetchBookData(bookKey) {
