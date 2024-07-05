@@ -89,8 +89,11 @@ async function displayResults(data) {
     return fetchBookData(result.key).then(bookData => {
       if (bookData) {
         const descriptionText = document.createElement('p');
-        descriptionText.textContent = bookData.description.value || bookData.description;
-        descriptionElement.textContent = '';
+        const description = bookData?.description?.value || bookData?.description;
+        if (description) {
+          descriptionText.textContent = description;
+          descriptionElement.textContent = '';
+        }
         descriptionElement.appendChild(descriptionText);
       }
     });
