@@ -22,8 +22,10 @@ searchButton.addEventListener('click', searchBooks);
 searchBar.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     searchBooks();
-  }
-});async function searchBooks() {
+}
+});
+
+async function searchBooks() {
     try {
         const categoryValue = await getSearchBarValue();
         const data = await fetchSubjectData(categoryValue);
@@ -32,6 +34,7 @@ searchBar.addEventListener('keydown', (e) => {
         displayErrorMessage(error);
     }
 }
+
 function getSearchBarValue() {
     return new Promise((resolve, reject) => {
         const category = document.getElementById('searchBar');
@@ -64,6 +67,24 @@ async function fetchSubjectData(categoryValue) {
         throw error;
     }
 }
+
+const loadingBar = document.getElementById('loading-bar');
+
+async function searchBooks() {
+  try {
+    loadingBar.style.display = 'block';
+
+    const categoryValue = await getSearchBarValue();
+    const data = await fetchSubjectData(categoryValue);
+    displayResults(data);
+
+    loadingBar.style.display = 'none';
+  } catch (error) {
+    displayErrorMessage(error);
+    loadingBar.style.display = 'none';
+  }
+}
+
 async function displayResults(data) {
     const resultsElement = document.getElementById('results');
     if (!resultsElement) {

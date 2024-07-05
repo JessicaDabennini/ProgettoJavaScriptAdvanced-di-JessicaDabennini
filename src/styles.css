@@ -77,3 +77,11 @@ margin-top: 10px;
     width: 100%;
 }
 
+#loading-bar {
+    display: none;
+    width: 40%;
+    background-color: #f0f0f081;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
