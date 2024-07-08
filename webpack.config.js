@@ -7,7 +7,13 @@ const path = require('path');
      path: path.resolve(__dirname, 'dist'),
      clean: true,
      },
-    mode: 'development',
+   mode: 'development',
+   resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
+    },
+   externals: {
+      axios: 'axios',
+    },
    module: {
      rules: [
        {
