@@ -108,17 +108,27 @@ const loadingBar = document.getElementById('loading-bar');
 // }
 
 async function searchBooks() {
+  alert('searchBooks() called');
   loadingBar.style.display = 'block';
 
+  console.log('Getting search bar value');
   const categoryValue = await getSearchBarValue();
+  console.log('Search bar value:', categoryValue);
+
+  console.log('Fetching subject data');
   const data = await fetchSubjectData(categoryValue);
+  console.log('Subject data:', data);
+
+  console.log('Displaying results');
   displayResults(data);
 
   loadingBar.style.display = 'none';
+
+ alert('searchBooks() complete');
 }
 
 async function displayResults(data) {
-  console.log('Displaying results:', data);
+ alert('Displaying results:', data);
   const resultsElement = document.getElementById('results');
   if (!resultsElement) {
     console.error('Results element not found');
@@ -126,7 +136,7 @@ async function displayResults(data) {
   }
   resultsElement.textContent = '';
   if (!data || !data.works) {
-    console.error('Invalid data:', data);
+    alert('Invalid data:', data);
     throw new Error('Invalid data');
   }
 
