@@ -111,13 +111,13 @@ async function searchBooks() {
   alert('searchBooks() called');
   loadingBar.style.display = 'block';
 
-  console.log('Getting search bar value');
+  alert('Getting search bar value');
   const categoryValue = await getSearchBarValue();
   console.log('Search bar value:', categoryValue);
 
-  console.log('Fetching subject data');
+  alert('Fetching subject data');
   const data = await fetchSubjectData(categoryValue);
-  console.log('Subject data:', data);
+  alert('Subject data:', data);
 
   console.log('Displaying results');
   displayResults(data);
@@ -140,7 +140,7 @@ async function displayResults(data) {
     throw new Error('Invalid data');
   }
 
-  const promises = data.works.map(result => {
+    const promises = data.works.map(result => {
     const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
     const resultElement = document.createElement('li');
     resultElement.textContent = `${result.title || ''} by ${authors}`;
