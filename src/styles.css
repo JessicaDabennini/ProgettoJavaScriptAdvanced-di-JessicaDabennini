@@ -86,12 +86,11 @@ margin-top: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-@media only screen and (max-width: 480px) {
+/* @media only screen and (max-width: 480px) {
     button {
         font-size: 20px;
         width: 40%;
         height: 40px;
-
     }
 
     input {
@@ -106,4 +105,28 @@ margin-top: 10px;
         text-align: center;
     }
 
+} */
+
+@media only screen and (max-width: 480px) {
+    input {
+        width: 80%;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    button {
+        font-size: 20px;
+        width: 40%;
+        height: 40px;
+    }
+
+    #results {
+        padding-right: 20px;
+    }
+
+    #loading-bar {
+        width: 90%;
+        font-size: 12px;
+        text-align: center;
+    }
 }
