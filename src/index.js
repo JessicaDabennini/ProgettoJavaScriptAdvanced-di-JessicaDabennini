@@ -46,22 +46,16 @@ const getSearchBarValue = () => document.getElementById('searchBar')?.value.trim
 // }
 
 function fetchSubjectData(categoryValue) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `https://openlibrary.org/subjects/${categoryValue}.json`, true);
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        resolve(JSON.parse(xhr.responseText));
-      } else {
-        reject(xhr.statusText);
+  return fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Bad Request');
       }
-    };
-    xhr.onerror = function() {
-      reject(xhr.statusText);
-    };
-    xhr.send();
-  });
+      return response.json();
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
 }
 
 const loadingBar = document.getElementById('loading-bar');
