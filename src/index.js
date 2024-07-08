@@ -35,51 +35,7 @@ searchButton.addEventListener('touchend', () => {
         });
 });
 
-// async function searchBooks() {
-//     let categoryValue;
-//     try {
-//         categoryValue = await getSearchBarValue().catch(displayErrorMessage);
-//         if (!categoryValue) return;
-//         const data = await fetchSubjectData(categoryValue).catch(displayErrorMessage);
-//         if (!data) return;
-//         displayResults(data);
-//     } catch (error) {
-//         console.error('An error occurred during search:', error);
-//         throw error;
-//     }
-// }
-
 const getSearchBarValue = () => document.getElementById('searchBar')?.value.trim() || Promise.reject(new Error('Search bar not found'));
-
-// async function fetchSubjectData(categoryValue) {
-//   const url = `https://openlibrary.org/subjects/${categoryValue}.json`;
-//   const response = await fetch(url);
-//   if (!response.ok) throw new Error('Bad Request');
-//   return await response.json();
-// }
-
-// function fetchSubjectData(categoryValue) {
-//   return fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
-//     .then(response => {
-//       if (!response.ok) {
-//         throw new Error('Bad Request');
-//       }
-//       return response.json();
-//     })
-//     .catch(error => {
-//       console.error('Error fetching data:', error);
-//     });
-// }
-
-
-// async function fetchSubjectData(categoryValue) {
-//   try {
-//     const response = await axios.get(`https://openlibrary.org/subjects/${categoryValue}.json`);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//   }
-// }
 
 async function fetchSubjectData(categoryValue) {
   try {
@@ -92,43 +48,22 @@ async function fetchSubjectData(categoryValue) {
 
 const loadingBar = document.getElementById('loading-bar');
 
-// async function searchBooks() {
-//   try {
-//     loadingBar.style.display = 'block';
-
-//     const categoryValue = await getSearchBarValue();
-//     const data = await fetchSubjectData(categoryValue);
-//     displayResults(data);
-
-//     loadingBar.style.display = 'none';
-//   } catch (error) {
-//     displayErrorMessage(error);
-//     loadingBar.style.display = 'none';
-//   }
-// }
-
 async function searchBooks() {
-  alert('searchBooks() called');
   loadingBar.style.display = 'block';
 
-  alert('Getting search bar value');
   const categoryValue = await getSearchBarValue();
   console.log('Search bar value:', categoryValue);
 
-  alert('Fetching subject data');
   const data = await fetchSubjectData(categoryValue);
-  alert('Subject data:', data);
 
   console.log('Displaying results');
   displayResults(data);
 
   loadingBar.style.display = 'none';
 
- alert('searchBooks() complete');
 }
 
 async function displayResults(data) {
- alert('Displaying results:', data);
   const resultsElement = document.getElementById('results');
   if (!resultsElement) {
     console.error('Results element not found');
@@ -136,7 +71,6 @@ async function displayResults(data) {
   }
   resultsElement.textContent = '';
   if (!data || !data.works) {
-    alert('Invalid data:', data);
     throw new Error('Invalid data');
   }
 
@@ -176,7 +110,6 @@ async function displayResults(data) {
   });
 
   await Promise.all(promises);
-  alert('Finished displaying results');
 }
 
 function toggleDescription(event) {
