@@ -45,17 +45,28 @@ const getSearchBarValue = () => document.getElementById('searchBar')?.value.trim
 //   return await response.json();
 // }
 
-function fetchSubjectData(categoryValue) {
-  return fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Bad Request');
-      }
-      return response.json();
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
+// function fetchSubjectData(categoryValue) {
+//   return fetch(`https://openlibrary.org/subjects/${categoryValue}.json`)
+//     .then(response => {
+//       if (!response.ok) {
+//         throw new Error('Bad Request');
+//       }
+//       return response.json();
+//     })
+//     .catch(error => {
+//       console.error('Error fetching data:', error);
+//     });
+// }
+
+import axios from 'axios';
+
+async function fetchSubjectData(categoryValue) {
+  try {
+    const response = await axios.get(`https://openlibrary.org/subjects/${categoryValue}.json`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 }
 
 const loadingBar = document.getElementById('loading-bar');
