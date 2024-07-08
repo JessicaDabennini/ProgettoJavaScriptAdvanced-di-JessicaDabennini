@@ -38,11 +38,29 @@ searchButton.addEventListener('touchend', () => { searchBooks(); });async functi
 
 const getSearchBarValue = () => document.getElementById('searchBar')?.value.trim() || Promise.reject(new Error('Search bar not found'));
 
-async function fetchSubjectData(categoryValue) {
-  const url = `https://openlibrary.org/subjects/${categoryValue}.json`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Bad Request');
-  return await response.json();
+// async function fetchSubjectData(categoryValue) {
+//   const url = `https://openlibrary.org/subjects/${categoryValue}.json`;
+//   const response = await fetch(url);
+//   if (!response.ok) throw new Error('Bad Request');
+//   return await response.json();
+// }
+
+function fetchSubjectData(categoryValue) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `https://openlibrary.org/subjects/${categoryValue}.json`, true);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(xhr.statusText);
+      }
+    };
+    xhr.onerror = function() {
+      reject(xhr.statusText);
+    };
+    xhr.send();
+  });
 }
 
 const loadingBar = document.getElementById('loading-bar');
