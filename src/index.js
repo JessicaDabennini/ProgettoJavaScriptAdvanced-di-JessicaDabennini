@@ -118,10 +118,17 @@ async function searchBooks() {
 }
 
 async function displayResults(data) {
+  console.log('Displaying results:', data);
   const resultsElement = document.getElementById('results');
-  if (!resultsElement) throw new Error('Results element not found');
+  if (!resultsElement) {
+    console.error('Results element not found');
+    throw new Error('Results element not found');
+  }
   resultsElement.textContent = '';
-  if (!data || !data.works) throw new Error('Invalid data');
+  if (!data || !data.works) {
+    console.error('Invalid data:', data);
+    throw new Error('Invalid data');
+  }
 
   const promises = data.works.map(result => {
     const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
@@ -153,11 +160,13 @@ async function displayResults(data) {
           descriptionElement.textContent = '';
         }
         descriptionElement.appendChild(descriptionText);
+        console.log('Added description:', description, 'for book:', result.title);
       }
     });
   });
 
   await Promise.all(promises);
+  alert('Finished displaying results');
 }
 
 function toggleDescription(event) {
