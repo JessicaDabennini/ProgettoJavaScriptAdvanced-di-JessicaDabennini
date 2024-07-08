@@ -28,12 +28,7 @@ searchButton.addEventListener('click', () => {
   searchBooks();
 });
 
-searchBar.addEventListener('touchstart', (e) => {
-    searchBooks();
-  }
-);
-
-async function searchBooks() {
+searchButton.addEventListener('touchend', () => { searchBooks(); });async function searchBooks() {
     const categoryValue = await getSearchBarValue().catch(displayErrorMessage);
     if (!categoryValue) return;
     const data = await fetchSubjectData(categoryValue).catch(displayErrorMessage);
