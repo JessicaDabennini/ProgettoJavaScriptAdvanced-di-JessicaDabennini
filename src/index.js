@@ -60,7 +60,6 @@ async function searchBooks() {
   displayResults(data);
 
   loadingBar.style.display = 'none';
-
 }
 
 async function displayResults(data) {
@@ -71,9 +70,15 @@ async function displayResults(data) {
   }
   resultsElement.textContent = '';
   if (!data || !data.works) {
+    const errorMessageElement = document.getElementById('error-message');
+    if (!errorMessageElement) {
+      console.error('Error message element not found');
+      throw new Error('Error message element not found');
+    }
+    errorMessageElement.textContent = 'Sorry...this category does not exist or there are no results available';
+    errorMessageElement.id = 'errorMessage';
     throw new Error('Invalid data');
   }
-
     const promises = data.works.map(result => {
     const authors = result.authors ? result.authors.map(author => author.name).join(', ') : '';
     const resultElement = document.createElement('li');
